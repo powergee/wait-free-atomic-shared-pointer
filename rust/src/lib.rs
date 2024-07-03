@@ -181,6 +181,9 @@ struct ArcCellInternal<const NULLABLE: bool, T> {
   value: AtomicUsize
 }
 
+unsafe impl<const NULLABLE: bool, T: Send + Sync> Send for ArcCellInternal<NULLABLE, T> {}
+unsafe impl<const NULLABLE: bool, T: Send + Sync> Sync for ArcCellInternal<NULLABLE, T> {}
+
 impl<T> ArcCellInternal<true, T> {
   fn null(tag: usize) -> ArcCellInternal<true, T> {
     ArcCellInternal{
@@ -362,6 +365,12 @@ impl<const NULLABLE: bool, T> Drop for ArcCellInternal<NULLABLE, T> {
 
 pub struct ArcCell<T>(ArcCellInternal<false, T>);
 pub struct OptionalArcCell<T>(ArcCellInternal<true, T>);
+
+unsafe impl<T: Send + Sync> Send for ArcCell<T> {}
+unsafe impl<T: Send + Sync> Sync for ArcCell<T> {}
+
+unsafe impl<T: Send + Sync> Send for OptionalArcCell<T> {}
+unsafe impl<T: Send + Sync> Sync for OptionalArcCell<T> {}
 
 impl<T> ArcCell<T> {
   pub fn new(value: T) -> ArcCell<T> {
